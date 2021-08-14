@@ -22,6 +22,7 @@
         <activity android:name=".Monitoring"/>
         <activity android:name=".Record"/>
         <activity android:name=".Notice"/>
+        <activity android:name=".HistoryCalendar"/>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

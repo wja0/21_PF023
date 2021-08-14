@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         btn_record.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(),Record.class);
+                Intent intent = new Intent(getApplicationContext(), Record.class);
                 startActivity(intent);
             }
         });
