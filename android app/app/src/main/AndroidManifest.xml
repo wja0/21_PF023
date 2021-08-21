@@ -19,10 +19,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Monitoring"/>
-        <activity android:name=".Record"/>
-        <activity android:name=".Notice"/>
         <activity android:name=".HistoryCalendar"/>
+        <activity android:name=".Monitoring"/>
+        <activity android:name=".Notice"/>
+        <activity android:name=".Record"/>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

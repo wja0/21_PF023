@@ -1,5 +1,7 @@
 package com.example.probono;
 
+import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,60 +10,59 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.ArrayList;
 
-public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ItemViewHolder> {
+// 데이터 가져와서 파베에 뿌리기
+public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordViewHolder> {
 
-    // adapter에 들어갈 list 입니다.
-    private ArrayList<Data> listData = new ArrayList<>();
+    private ArrayList<RecordData> arrayList; // 객체 클래스에 추가
+    private Context context; // 어댑터에서 context를 가져올때
+
+    public RecordAdapter(ArrayList<RecordData> arrayList, Context context) {
+        this.arrayList = arrayList;
+        this.context = context;
+    }
 
     @NonNull
+    @org.jetbrains.annotations.NotNull
     @Override
-    public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // LayoutInflater를 이용하여 전 단계에서 만들었던 notice_item.xml을 inflate 시킵니다.
-        // return 인자는 ViewHolder 입니다.
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.record_item, parent, false);
-        return new ItemViewHolder(view);
+    public RecordViewHolder onCreateViewHolder(@NonNull @org.jetbrains.annotations.NotNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.record_item, parent, false); // 레이아웃 연결
+        RecordViewHolder holder = new RecordViewHolder(view);
+        return holder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
-        // Item을 하나, 하나 보여주는(bind 되는) 함수입니다.
-        holder.onBind(listData.get(position));
+    public void onBindViewHolder(@NonNull @org.jetbrains.annotations.NotNull RecordAdapter.RecordViewHolder holder, int position) {
+        // 각 아이템에 대한 매칭
+//        Glide.with(holder.itemView)
+//                .load(arrayList.get(position).getProfile())
+//                .into(holder.iv_profile);
+        // firebase 데이터를 가져오면 user 객체가 있는 arraylist에 담아서 어댑터에 전송
+        // 여기서 그걸 받아서 gilde로 load
+        // server에서 이미지 가져와서 출력
+        holder.nowtime.setText(arrayList.get(position).getNowtime());
+        holder.category.setText(arrayList.get(position).getCategory()); // 타입 에러 방지
+       // holder.contents.setText(arrayList.get(position).getContents());
+
     }
 
     @Override
     public int getItemCount() {
-        // RecyclerView의 총 개수 입니다.
-        return listData.size();
+        return arrayList.size();
+        // (arrayList != null ? arrayList.size() : Log.i("ArrayList", "no"));
     }
 
-    void addItem(Data data) {
-        // 외부에서 item을 추가시킬 함수입니다.
-        listData.add(data);
-    }
+    public class RecordViewHolder extends RecyclerView.ViewHolder {
+        TextView nowtime;
+        TextView category;
+        //TextView contents;
 
-    // RecyclerView의 핵심인 ViewHolder 입니다.
-    // 여기서 subView를 setting 해줍니다.
-    class ItemViewHolder extends RecyclerView.ViewHolder {
-        private ImageView recordImage;
-        private TextView recordTitle;
-        private TextView recordContent;
-        private TextView recordTime;
-
-        ItemViewHolder(View itemView) {
+        public RecordViewHolder(@NonNull @org.jetbrains.annotations.NotNull View itemView) {
             super(itemView);
-
-            recordTitle = itemView.findViewById(R.id.recordTitle);
-            recordContent = itemView.findViewById(R.id.recordContent);
-            recordTime = itemView.findViewById(R.id.recordTime);
-        }
-
-        void onBind(Data data) {
-            recordTitle.setText(data.getTitle());
-            recordContent.setText(data.getContent());
-            recordTime.setText(data.getTime());
+            this.nowtime = itemView.findViewById(R.id.nowtime);
+            this.category = itemView.findViewById(R.id.category);
+         //   this.contents = itemView.findViewById(R.id.contents);
         }
     }
 }

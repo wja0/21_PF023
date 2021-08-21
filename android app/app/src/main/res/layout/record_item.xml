@@ -5,44 +5,50 @@
     android:layout_height="wrap_content"
     android:padding="8dp"
     android:gravity="center_vertical"
-    android:layout_marginBottom="8dp" >
+    android:layout_marginBottom="8dp">
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginLeft="8dp">
+        android:layout_marginLeft="8dp"
+        android:weightSum="10">
 
         <TextView
-            android:id="@+id/recordTitle"
+            android:id="@+id/nowtime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
-            android:text="TITLE"
+            android:text="nowtime"
+            android:textSize="16sp"
+            android:layout_weight="4"
+            android:textColor="@android:color/darker_gray"/>
+
+        <TextView
+            android:id="@+id/category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:text="category"
             android:textSize="18sp"
             android:textColor="@android:color/black"
+            android:layout_weight="6"
             android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/recordContent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:includeFontPadding="false"
-            android:layout_marginTop="5dp"
-            android:text="content"
-            android:textSize="15sp"
-            android:textColor="@android:color/darker_gray"/>
+<!--        <TextView-->
+<!--            android:id="@+id/contents"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:includeFontPadding="false"-->
+<!--            android:layout_marginTop="5dp"-->
+<!--            android:text="contents"-->
+<!--            android:textSize="15sp"-->
+<!--            android:layout_weight="4"-->
+<!--            android:textColor="@android:color/darker_gray"/>-->
+
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/recordTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:includeFontPadding="false"
-        android:text="time"
-        android:textSize="16sp"
-        android:textColor="@android:color/darker_gray"/>
 
 </LinearLayout>
