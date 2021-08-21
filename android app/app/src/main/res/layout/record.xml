@@ -30,7 +30,6 @@
             android:layout_marginLeft="8dp"
             android:layout_weight="0.73"
             android:gravity="center_vertical"
-            android:text="2021년 8월 14일"
             android:textSize="18sp"
             android:textStyle="bold" />
     </LinearLayout>

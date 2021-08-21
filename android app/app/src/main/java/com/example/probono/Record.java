@@ -20,6 +20,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -42,7 +43,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 public class Record extends AppCompatActivity {
+
+private TextView whatday_log;
+boolean sett;
+
+//아래 세줄 time1에 오늘 날짜 넣기
+SimpleDateFormat format1 = new SimpleDateFormat( "yyyy-MM-dd");
+Date time = new Date();
+String time1 = format1.format(time);
 
 //    public String getContents() {
 //        return contents;
@@ -75,8 +85,12 @@ public class Record extends AppCompatActivity {
         // 가져오기
         super.onCreate(savedInstanceState);
         setContentView(R.layout.record);
+        Log.d("타임", time1);
+
 
         recyclerView = findViewById(R.id.recordRecyclerView); // item 여러개 출력하는 layout
+
+
         recyclerView.setHasFixedSize(true); // 리사이클러뷰 기존 성능 강화
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -84,7 +98,8 @@ public class Record extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance(); // 파이어베이스 DB 연동
 
-        databaseReference = database.getReference("2021-08-14"); // DB 테이블 연동 맨 위 값
+
+        databaseReference = database.getReference(time1); // DB 테이블 연동 맨 위 값
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -168,6 +183,23 @@ public class Record extends AppCompatActivity {
             }
         });
 
+        whatday_log = (TextView) findViewById(R.id.textCalendar);
+        //아래 , historycalendar에서 클릭한 날짜 값 가져오고 표시하기
+        Intent receive_intent = getIntent();
+        String temp = receive_intent.getStringExtra("cal");
+        if(temp != null){
+            temp = temp.substring(12, 21);
+            whatday_log.setText(temp);
+            getIntent().removeExtra("cal");
+
+        }
+
+        //아래 두 줄 달력 옆 날짜 오늘으로 설정
+        if(temp == null)
+        {
+            whatday_log.setText(time1);
+        }
+
     }
 
     @Override
@@ -189,15 +221,14 @@ public class Record extends AppCompatActivity {
                                         //파이어베이스 저장
                                         String nowtime = hourOfDay + "시 " + minute + "분 ";
 
-                                        SimpleDateFormat format1 = new SimpleDateFormat( "yyyy-MM-dd");
-                                        Date time = new Date();
-                                        String time1 = format1.format(time);
+
+
 
                                         if (a == 1){
                                             Map<String, Object> taskMap = new HashMap<String, Object>();
                                             taskMap.put("nowtime", nowtime);
                                             taskMap.put("category", "모유");
-                                            databaseReference.child(time1).child(String.valueOf(num)).updateChildren(taskMap);
+                                            databaseReference.child(String.valueOf(num)).updateChildren(taskMap);
                                             num = num + 1;
 
                                         }
@@ -206,7 +237,7 @@ public class Record extends AppCompatActivity {
                                             Map<String, Object> taskMap = new HashMap<String, Object>();
                                             taskMap.put("nowtime", nowtime);
                                             taskMap.put("category", "분유");
-                                            databaseReference.child(time1).child(String.valueOf(num)).updateChildren(taskMap);
+                                            databaseReference.child(String.valueOf(num)).updateChildren(taskMap);
                                             num = num + 1;
                                         }
 
@@ -214,7 +245,7 @@ public class Record extends AppCompatActivity {
                                             Map<String, Object> taskMap = new HashMap<String, Object>();
                                             taskMap.put("nowtime", nowtime);
                                             taskMap.put("category", "소변");
-                                            databaseReference.child(time1).child(String.valueOf(num)).updateChildren(taskMap);
+                                            databaseReference.child(String.valueOf(num)).updateChildren(taskMap);
                                             num = num + 1;
                                         }
 
@@ -222,7 +253,7 @@ public class Record extends AppCompatActivity {
                                             Map<String, Object> taskMap = new HashMap<String, Object>();
                                             taskMap.put("nowtime", nowtime);
                                             taskMap.put("category", "대변");
-                                            databaseReference.child(time1).child(String.valueOf(num)).updateChildren(taskMap);
+                                            databaseReference.child(String.valueOf(num)).updateChildren(taskMap);
                                             num = num + 1;
                                         }
 
@@ -230,13 +261,13 @@ public class Record extends AppCompatActivity {
                                             Map<String, Object> taskMap = new HashMap<String, Object>();
                                             taskMap.put("nowtime", nowtime);
                                             taskMap.put("category", "수면");
-                                            databaseReference.child(time1).child(String.valueOf(num)).updateChildren(taskMap);
+                                            databaseReference.child(String.valueOf(num)).updateChildren(taskMap);
                                             num = num + 1;
                                         }
 
                                     }
                                 }, // 값설정시 호출될 리스너 등록
-                                4, 19, false); // 기본값 시분 등록
+                                12, 00, false); // 기본값 시분 등록
                 // true : 24 시간(0~23) 표시
                 // false : 오전/오후 항목이 생김
                 return tpd;
