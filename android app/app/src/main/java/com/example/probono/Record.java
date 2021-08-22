@@ -188,7 +188,7 @@ String time1 = format1.format(time);
         Intent receive_intent = getIntent();
         String temp = receive_intent.getStringExtra("cal");
         if(temp != null){
-            temp = temp.substring(12, 21);
+            //temp = temp.substring(12, 21);
             whatday_log.setText(temp);
             getIntent().removeExtra("cal");
 
