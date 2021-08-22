@@ -85,7 +85,9 @@ String time1 = format1.format(time);
         // 가져오기
         super.onCreate(savedInstanceState);
         setContentView(R.layout.record);
-        Log.d("타임", time1);
+        // 파이어베이스에서 값 받아올때 필요한 변수여서 위로 올림
+        Intent receive_intent = getIntent();
+        String temp = receive_intent.getStringExtra("cal");
 
 
         recyclerView = findViewById(R.id.recordRecyclerView); // item 여러개 출력하는 layout
@@ -98,8 +100,15 @@ String time1 = format1.format(time);
 
         database = FirebaseDatabase.getInstance(); // 파이어베이스 DB 연동
 
-
-        databaseReference = database.getReference(time1); // DB 테이블 연동 맨 위 값
+// DATE 가져오기
+        if (temp == null) {
+            databaseReference = database.getReference(time1);
+            // DB 테이블 연동 맨 위 값
+        }
+        else {
+            databaseReference = database.getReference(String.valueOf(temp));
+        }
+        Log.d("날짜", String.valueOf(temp));
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -185,8 +194,6 @@ String time1 = format1.format(time);
 
         whatday_log = (TextView) findViewById(R.id.textCalendar);
         //아래 , historycalendar에서 클릭한 날짜 값 가져오고 표시하기
-        Intent receive_intent = getIntent();
-        String temp = receive_intent.getStringExtra("cal");
         if(temp != null){
             //temp = temp.substring(12, 21);
             whatday_log.setText(temp);
@@ -219,7 +226,20 @@ String time1 = format1.format(time);
 //                                                Toast.LENGTH_SHORT).show();
 
                                         //파이어베이스 저장
-                                        String nowtime = hourOfDay + "시 " + minute + "분 ";
+                                        String nowtime = "";
+                                        // 포맷 추가
+                                        if (hourOfDay/10 == 0){
+                                            nowtime += "0" + hourOfDay + "시 ";
+                                        }
+                                        else{
+                                            nowtime += hourOfDay + "시 ";
+                                        }
+                                        if (minute/10 == 0){
+                                            nowtime += "0" + minute + "분 ";
+                                        }
+                                        else{
+                                            nowtime += minute + "분 ";
+                                        }
 
 
 
