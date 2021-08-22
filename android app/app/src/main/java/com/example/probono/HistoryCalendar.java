@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -38,7 +39,24 @@ public class HistoryCalendar extends AppCompatActivity {
 
 
                 Intent intent01 = new Intent(getApplicationContext(), Record.class);
-                intent01.putExtra("cal", "" + date);
+                // date formate 변경
+                String format_date = "";
+                format_date += date.getYear() + "-";
+                if (date.getMonth()/10 == 0){
+                    format_date += "0" + date.getMonth() + "-";
+                }
+                else{
+                    format_date += date.getMonth() + "-";
+                }
+                if (date.getDay()/10 == 0){
+                    format_date += "0" + date.getDay();
+                }
+                else{
+                    format_date += date.getDay();
+                }
+
+                intent01.putExtra("cal", ""+format_date);
+                Log.d("달력날짜", format_date);
                 startActivity(intent01);
 
 //                LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
