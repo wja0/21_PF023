@@ -11,6 +11,7 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -48,6 +49,7 @@ public class Record extends AppCompatActivity {
 
 private TextView whatday_log;
 boolean sett;
+String temp;
 
 //아래 세줄 time1에 오늘 날짜 넣기
 SimpleDateFormat format1 = new SimpleDateFormat( "yyyy-MM-dd");
@@ -87,7 +89,7 @@ String time1 = format1.format(time);
         setContentView(R.layout.record);
         // 파이어베이스에서 값 받아올때 필요한 변수여서 위로 올림
         Intent receive_intent = getIntent();
-        String temp = receive_intent.getStringExtra("cal");
+        temp = receive_intent.getStringExtra("cal");
 
 
         recyclerView = findViewById(R.id.recordRecyclerView); // item 여러개 출력하는 layout
@@ -110,7 +112,8 @@ String time1 = format1.format(time);
         }
         Log.d("날짜", String.valueOf(temp));
 
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.addValueEventListener(new ValueEventListener() {
+
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
                 // 파이어베이스 DB의 데이터를 받아오는 곳
@@ -207,6 +210,11 @@ String time1 = format1.format(time);
             whatday_log.setText(time1);
         }
 
+
+
+
+
+
     }
 
     @Override
@@ -244,14 +252,46 @@ String time1 = format1.format(time);
 
 
 
-                                        if (a == 1){
-                                            Map<String, Object> taskMap = new HashMap<String, Object>();
-                                            taskMap.put("nowtime", nowtime);
-                                            taskMap.put("category", "모유");
-                                            databaseReference.child(String.valueOf(num)).updateChildren(taskMap);
-                                            num = num + 1;
+
+
+
+                                        mAuth = FirebaseAuth.getInstance(); // 유저 계정 정보 가져오기
+                                        mDatabase = FirebaseDatabase.getInstance().getReference(); // 파이어베이스 realtime database 에서 정보 가져오기
+
+                                        databaseReference = database.getReference(time1);
+                                        String finalNowtime = nowtime;
+                                        mDatabase.addValueEventListener(new ValueEventListener() {
+                                                                            @Override
+                                                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                                                                                    // DB 테이블 연동 맨 위 값
+
+                                        for(int i = 1; i < 1000; i++){
+                                                if (snapshot.child(time1).child(String.valueOf(i)) == null && a == 1) {
+
+                                                    Map<String, Object> taskMap = new HashMap<String, Object>();
+                                                    taskMap.put("nowtime", finalNowtime);
+                                                    taskMap.put("category", "모유");
+                                                    databaseReference.child(String.valueOf(i)).updateChildren(taskMap);
+
+
+                                                }
 
                                         }
+                                                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+
+                                            }
+                                        });
+
+
+
+
+
+
+
 
                                         if (a == 2){
                                             Map<String, Object> taskMap = new HashMap<String, Object>();
