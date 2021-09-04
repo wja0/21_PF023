@@ -16,6 +16,7 @@ Min = 0
 while True:
     ret, img = cap.read()
     img = cv2.flip(img, -1) # 상하반전
+    img = cv2.flip(img, 1) # 좌우반전
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     faces = faceCascade.detectMultiScale(
         gray,
@@ -33,7 +34,7 @@ while True:
         print(str(Min) + " Mins " + str(Sec) + " Sec ")
 
         cv2.putText(img, "Time: " + str(Min) + " Mins " + str(Sec) + " Sec ", (0,img.shape[0] -30), cv2.FONT_HERSHEY_TRIPLEX, 0.5,  (0,0,255), 1)
-        cv2.putText(img, "Number of faces detected: " + str(faces.shape[0]), (0,img.shape[0] -10), cv2.FONT_HERSHEY_TRIPLEX, 0.5,  (0,0,255), 1)    
+#        cv2.putText(img, "Number of faces detected: " + str(faces.shape[0]), (0,img.shape[0] -10), cv2.FONT_HERSHEY_TRIPLEX, 0.5,  (0,0,255), 1)    
 
         time.sleep(1)
         if Sec == 60:
