@@ -13,6 +13,9 @@ cap.set(4,480) # set Height
 Sec = 0
 Min = 0
 
+Flag = False
+Alarm = False
+
 while True:
     ret, img = cap.read()
     img = cv2.flip(img, -1) # 상하반전
@@ -28,28 +31,38 @@ while True:
         cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
         roi_gray = gray[y:y+h, x:x+w]
         roi_color = img[y:y+h, x:x+w]
-    if len(faces) > 0:  
 
+    if len(faces) > 0:
+	if Flag == False: # 얼굴 인식 시작 초기화
+		Sec = 0
+		Min = 0
+	Flag = True # 인식 함
         Sec += 1
-        print(str(Min) + " Mins " + str(Sec) + " Sec ")
-
-        cv2.putText(img, "Time: " + str(Min) + " Mins " + str(Sec) + " Sec ", (0,img.shape[0] -30), cv2.FONT_HERSHEY_TRIPLEX, 0.5,  (0,0,255), 1)
-#        cv2.putText(img, "Number of faces detected: " + str(faces.shape[0]), (0,img.shape[0] -10), cv2.FONT_HERSHEY_TRIPLEX, 0.5,  (0,0,255), 1)    
-
         time.sleep(1)
         if Sec == 60:
             Sec = 0
             Min += 1
-            print(str(Min) + " Minute")                
+            print("Face Detection : " + str(Min) + " Mins")
+	if Sec == 20: # 자고 있다고 간주
+		print("아기가 잠들었어요!")
+		Alarm = True
 
     if len(faces) == 0:
+	if Flag == True: # 인식 하고 돌아옴
+		Flag = False
+		Sec = 0
+		Min = 0
+	if Alarm == True: # 자다가 얼굴인식이 안됨
+		if Sec == 30 :
+			print("아기가 잘 자고 있나요?")
+	Sec += 1
+	time.sleep(1)
+	if Sec == 60:
+		Sec = 0
+		Min += 1
+		print("No Face Detection Time : " + str(Min) + " Mins")
 
-#        print('No face detected')
-#        cv2.putText(img, "No face detected ", (0,img.shape[0] -10), cv2.FONT_HERSHEY_TRIPLEX, 0.5,  (0,0,255), 1)        
-        Sec = 0
-        Min = 0
-    
-    cv2.imshow('video',img) # video라는 이름으로 출력
+    cv2.imshow('Face Detection',img) # Face Detection라는 이름으로 출력
     k = cv2.waitKey(30) & 0xff
     if k == 27: # press 'ESC' to quit # ESC를 누르면 종료
         break
