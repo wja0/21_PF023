@@ -47,14 +47,16 @@ import java.util.Map;
 
 public class Record extends AppCompatActivity {
 
-private TextView whatday_log;
-boolean sett;
-String temp;
+    private TextView whatday_log;
+    boolean sett;
+    String temp;
+    String amt, bmt;
 
-//아래 세줄 time1에 오늘 날짜 넣기
-SimpleDateFormat format1 = new SimpleDateFormat( "yyyy-MM-dd");
-Date time = new Date();
-String time1 = format1.format(time);
+
+    //아래 세줄 time1에 오늘 날짜 넣기
+    SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+    Date time = new Date();
+    String time1 = format1.format(time);
 
 //    public String getContents() {
 //        return contents;
@@ -68,6 +70,7 @@ String time1 = format1.format(time);
     final int DIALOG_TIME = 2;
     int a;
     int num = 1;
+    boolean arr = true;
 
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
@@ -104,11 +107,11 @@ String time1 = format1.format(time);
 
 // DATE 가져오기
         if (temp == null) {
-            databaseReference = database.getReference(time1);
+            databaseReference = database.getReference("record").child(time1);
             // DB 테이블 연동 맨 위 값
-        }
-        else {
-            databaseReference = database.getReference(String.valueOf(temp));
+        } else {
+            databaseReference = database.getReference("record").child(String.valueOf(temp));
+            time1 = temp;
         }
         Log.d("날짜", String.valueOf(temp));
 
@@ -147,16 +150,16 @@ String time1 = format1.format(time);
         imageCalendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(),HistoryCalendar.class);
+                Intent intent = new Intent(getApplicationContext(), HistoryCalendar.class);
                 startActivity(intent);
             }
         });
 
-        Button b1 = (Button)findViewById(R.id.recordButton1);
-        Button b2 = (Button)findViewById(R.id.recordButton2);
-        Button b3 = (Button)findViewById(R.id.recordButton3);
-        Button b4 = (Button)findViewById(R.id.recordButton4);
-        Button b5 = (Button)findViewById(R.id.recordButton5);
+        Button b1 = (Button) findViewById(R.id.recordButton1);
+        Button b2 = (Button) findViewById(R.id.recordButton2);
+        Button b3 = (Button) findViewById(R.id.recordButton3);
+        Button b4 = (Button) findViewById(R.id.recordButton4);
+        Button b5 = (Button) findViewById(R.id.recordButton5);
 
 
         b1.setOnClickListener(new View.OnClickListener() {
@@ -197,7 +200,7 @@ String time1 = format1.format(time);
 
         whatday_log = (TextView) findViewById(R.id.textCalendar);
         //아래 , historycalendar에서 클릭한 날짜 값 가져오고 표시하기
-        if(temp != null){
+        if (temp != null) {
             //temp = temp.substring(12, 21);
             whatday_log.setText(temp);
             getIntent().removeExtra("cal");
@@ -205,14 +208,9 @@ String time1 = format1.format(time);
         }
 
         //아래 두 줄 달력 옆 날짜 오늘으로 설정
-        if(temp == null)
-        {
+        if (temp == null) {
             whatday_log.setText(time1);
         }
-
-
-
-
 
 
     }
@@ -236,23 +234,16 @@ String time1 = format1.format(time);
                                         //파이어베이스 저장
                                         String nowtime = "";
                                         // 포맷 추가
-                                        if (hourOfDay/10 == 0){
+                                        if (hourOfDay / 10 == 0) {
                                             nowtime += "0" + hourOfDay + "시 ";
-                                        }
-                                        else{
+                                        } else {
                                             nowtime += hourOfDay + "시 ";
                                         }
-                                        if (minute/10 == 0){
+                                        if (minute / 10 == 0) {
                                             nowtime += "0" + minute + "분 ";
-                                        }
-                                        else{
+                                        } else {
                                             nowtime += minute + "분 ";
                                         }
-
-
-
-
-
 
 
                                         mAuth = FirebaseAuth.getInstance(); // 유저 계정 정보 가져오기
@@ -260,70 +251,69 @@ String time1 = format1.format(time);
 
                                         databaseReference = database.getReference(time1);
                                         String finalNowtime = nowtime;
-                                        mDatabase.addValueEventListener(new ValueEventListener() {
-                                                                            @Override
-                                                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                                                                                    // DB 테이블 연동 맨 위 값
 
-                                        for(int i = 1; i < 1000; i++){
-                                                if (snapshot.child(time1).child(String.valueOf(i)) == null && a == 1) {
+                                                for (int i = 0; i < 1000; i++) {
+                                                    if (!snapshot.child("record").child(time1).child(String.valueOf(i)).exists() && a == 1) { //오늘날짜 생기고부터
 
-                                                    Map<String, Object> taskMap = new HashMap<String, Object>();
-                                                    taskMap.put("nowtime", finalNowtime);
-                                                    taskMap.put("category", "모유");
-                                                    databaseReference.child(String.valueOf(i)).updateChildren(taskMap);
+                                                        Map<String, Object> taskMap = new HashMap<String, Object>();
+                                                        taskMap.put("nowtime", finalNowtime);
+                                                        taskMap.put("category", "모유");
+                                                        database.getReference("record").child(time1).child(String.valueOf(i)).updateChildren(taskMap);
+                                                        break;
+                                                    }
+
+                                                    if (!snapshot.child("record").child(time1).child(String.valueOf(i)).exists() && a == 2) { //오늘날짜 생기고부터
+
+                                                        Map<String, Object> taskMap = new HashMap<String, Object>();
+                                                        taskMap.put("nowtime", finalNowtime);
+                                                        taskMap.put("category", "분유");
+                                                        database.getReference("record").child(time1).child(String.valueOf(i)).updateChildren(taskMap);
+                                                        break;
+                                                    }
+
+                                                    if (!snapshot.child("record").child(time1).child(String.valueOf(i)).exists() && a == 3) { //오늘날짜 생기고부터
+
+                                                        Map<String, Object> taskMap = new HashMap<String, Object>();
+                                                        taskMap.put("nowtime", finalNowtime);
+                                                        taskMap.put("category", "소변");
+                                                        database.getReference("record").child(time1).child(String.valueOf(i)).updateChildren(taskMap);
+                                                        break;
+                                                    }
+
+                                                    if (!snapshot.child("record").child(time1).child(String.valueOf(i)).exists() && a == 4) { //오늘날짜 생기고부터
+
+                                                        Map<String, Object> taskMap = new HashMap<String, Object>();
+                                                        taskMap.put("nowtime", finalNowtime);
+                                                        taskMap.put("category", "대변");
+                                                        database.getReference("record").child(time1).child(String.valueOf(i)).updateChildren(taskMap);
+                                                        break;
+                                                    }
+
+                                                    if (!snapshot.child("record").child(time1).child(String.valueOf(i)).exists() && a == 5) { //오늘날짜 생기고부터
+
+                                                        Map<String, Object> taskMap = new HashMap<String, Object>();
+                                                        taskMap.put("nowtime", finalNowtime);
+                                                        taskMap.put("category", "수면");
+                                                        database.getReference("record").child(time1).child(String.valueOf(i)).updateChildren(taskMap);
+                                                        break;
+                                                    }
 
 
                                                 }
+                                            }
 
-                                        }
-                                                                            }
 
                                             @Override
                                             public void onCancelled(@NonNull DatabaseError error) {
 
                                             }
+
                                         });
 
-
-
-
-
-
-
-
-                                        if (a == 2){
-                                            Map<String, Object> taskMap = new HashMap<String, Object>();
-                                            taskMap.put("nowtime", nowtime);
-                                            taskMap.put("category", "분유");
-                                            databaseReference.child(String.valueOf(num)).updateChildren(taskMap);
-                                            num = num + 1;
-                                        }
-
-                                        if (a == 3){
-                                            Map<String, Object> taskMap = new HashMap<String, Object>();
-                                            taskMap.put("nowtime", nowtime);
-                                            taskMap.put("category", "소변");
-                                            databaseReference.child(String.valueOf(num)).updateChildren(taskMap);
-                                            num = num + 1;
-                                        }
-
-                                        if (a == 4){
-                                            Map<String, Object> taskMap = new HashMap<String, Object>();
-                                            taskMap.put("nowtime", nowtime);
-                                            taskMap.put("category", "대변");
-                                            databaseReference.child(String.valueOf(num)).updateChildren(taskMap);
-                                            num = num + 1;
-                                        }
-
-                                        if (a == 5){
-                                            Map<String, Object> taskMap = new HashMap<String, Object>();
-                                            taskMap.put("nowtime", nowtime);
-                                            taskMap.put("category", "수면");
-                                            databaseReference.child(String.valueOf(num)).updateChildren(taskMap);
-                                            num = num + 1;
-                                        }
 
                                     }
                                 }, // 값설정시 호출될 리스너 등록
