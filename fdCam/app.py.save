@@ -17,7 +17,7 @@ firebase_admin.initialize_app(cred, {
 })
 
 
-ref = db.reference('alarm')
+ref = db.reference('alarm/alarm_01')
 
 # Cascades 디렉토리의 haarcascade_frontalface_default.xml 파일을 Classifier로 사용
 faceCascade = cv2.CascadeClassifier('/home/pi/fdCam/haarcascades/haarcascade_frontalface_default.xml')
@@ -61,7 +61,7 @@ def gen_frames():  # generate frame by frame from camera
                 if cnt1 == 20: # 자고 있다고 간주
                         print("아기가 잠들었어요!")
                         Alarm = True
-                        ref.update({'face detection' : 'true'})
+                        ref.delete()
                 else :
                         cnt1 += 1
                         print(cnt1)
@@ -72,7 +72,10 @@ def gen_frames():  # generate frame by frame from camera
                 if cnt2 == 30 :
                         print("아기가 잘 자고 있나요?")
                         Alarm = False
-                        ref.update({'face detection' : 'false'})
+                        now = time.localtime()
+                        ref.update({'title' : '질식사 위험'})
+                        ref.update({'comment' : '아기가 잘 자고 있나요?'})
+                        ref.update({'time'  :  "%04d/%02d/%02d %02d:%02d"%(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour,now.tm_min)})
                         cnt2 = 0
                 else :
                         cnt2 += 1
