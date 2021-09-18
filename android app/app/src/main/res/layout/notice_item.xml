@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/notice"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -8,7 +9,7 @@
     android:layout_marginBottom="8dp">
 
     <ImageView
-        android:id="@+id/noticeImage"
+        android:id="@+id/image"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:src="@mipmap/ic_launcher" />
@@ -22,7 +23,7 @@
         android:layout_marginLeft="20dp">
 
         <TextView
-            android:id="@+id/noticeTitle"
+            android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
@@ -32,21 +33,22 @@
             android:textStyle="bold"/>
 
         <TextView
-            android:id="@+id/noticeContent"
+            android:id="@+id/comment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
             android:layout_marginTop="5dp"
-            android:text="content"
+            android:text="comment"
             android:textSize="15sp"
             android:textColor="@android:color/darker_gray"/>
     </LinearLayout>
 
     <TextView
-        android:id="@+id/noticeTime"
+        android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:includeFontPadding="false"
+        android:layout_marginBottom="15dp"
         android:text="time"
         android:textSize="16sp"
         android:textColor="@android:color/darker_gray"/>
