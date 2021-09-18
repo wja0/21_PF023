@@ -1,71 +1,69 @@
 package com.example.probono;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.util.Log;
 
-import java.util.Arrays;
-import java.util.List;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 
 public class Notice extends AppCompatActivity {
 
-    NoticeAdapter adapter;
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
+    private ArrayList<NoticeData> arrayList; // 중간 통신 매개체
+    private FirebaseDatabase database;
+    private DatabaseReference databaseReference;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notice);
 
-        init();
+        recyclerView = findViewById(R.id.noticeRecyclerView); // item 여러개 출력하는 layout
+        recyclerView.setHasFixedSize(true); // 리사이클러뷰 기존 성능 강화
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        arrayList = new ArrayList<>(); // user 객체를 담을 어레이 리스트 (어댑터 쪽으로 전송)
 
-        getData();
-    }
+        database = FirebaseDatabase.getInstance(); // 파이어베이스 DB 연동
 
-    private void init() {
-        RecyclerView recyclerView = findViewById(R.id.noticeRecyclerView);
+        databaseReference = database.getReference("alarm"); // DB 테이블 연동 맨 위 값
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
+                // 파이어베이스 DB의 데이터를 받아오는 곳
+                arrayList.clear(); // 기존 배열리스트가 존재하지 않게 초기화 add 전에
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) { // 반복문으로 데이터 List를 추출해냄
+                    NoticeData Notice = snapshot.getValue(NoticeData.class); //만들어뒀던 user 객체에 데이터를 담는다.
+                    arrayList.add(Notice); // 담은 데이터들을 배열리스트에 넣고 리사이클러뷰로 보낼 준비
+                    Log.d("파베 데이터 값", String.valueOf(Notice));
+                }
+                adapter.notifyDataSetChanged(); // 리스트 저장 및 새로고침
+            }
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(linearLayoutManager);
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError databaseError) {
+                // DB를 가져오던 중 에러 발생 시
+                Log.e("Notice", String.valueOf(databaseError.toException())); // 에러문 출력
+            }
+        });
 
-        adapter = new NoticeAdapter();
-        recyclerView.setAdapter(adapter);
-    }
+        adapter = new NoticeAdapter(arrayList, this); // NoticeAdapter와 연동
+        recyclerView.setAdapter(adapter); // 리사이클러뷰에 어댑터 연결
 
-    private void getData() {
-        List<Integer> listResId = Arrays.asList(
-                R.drawable.ic_baseline_camera_alt_24,
-                R.drawable.ic_baseline_mic_24,
-                R.drawable.ic_baseline_warning_24
-        );
-
-        List<String> listTitle = Arrays.asList(
-                "낙상위험",
-                "울음소리 감지",
-                "질식사 위험 감지"
-        );
-
-        List<String> listContent = Arrays.asList(
-                "아이가 침대에서 떨어질 뻔했어요!!",
-                "아이가 울고있어요!!",
-                "아이가 위험해요!!!"
-        );
-
-        // *** 이 부분은 if문으로 조건 맞춰서 수정 필요 ***
-        for (int i = 0; i < listTitle.size(); i++) {
-            // 각 List의 값들을 data 객체에 set 해줍니다.
-            Data data = new Data();
-            data.setTitle(listTitle.get(i));
-            data.setContent(listContent.get(i));
-            data.setResId(listResId.get(i));
-
-            // 각 값이 들어간 data를 adapter에 추가합니다.
-            adapter.addItem(data);
-        }
-
-        // adapter의 값이 변경되었다는 것을 알려줍니다.
-        adapter.notifyDataSetChanged();
     }
 }
-
