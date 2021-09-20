@@ -3,10 +3,15 @@
 from __future__ import print_function
 import time
 import RPi.GPIO as GPIO
-
+import time
 import firebase_admin
 from firebase_admin import auth
 from firebase_admin import credentials, db
+from bluetooth import *
+
+# bluetooth
+socket = BluetoothSocket(RFCOMM)
+socket.connect(("98:D3:71:FD:BF:91", 1))
 
 #from firebase_admin import firestore
 
@@ -16,7 +21,7 @@ firebase_admin.initialize_app(cred, {
 })
 
 
-ref = db.reference('alarm')
+ref = db.reference('alarm/alarm_02')
 
 
 def measure():
@@ -65,17 +70,22 @@ try:
         distance = measure_average()
         time.sleep(1)
 
-        if distance <= 45: # 아기 머리가 가까움
+        if distance < 45: # 아기 머리가 가까움
             if Flag == False :
                print("Distance Detection : %.1f" % distance)
-               ref.update({'distance detection' : 'true'})
+               now = time.localtime()
+               ref.update({'title' : '낙상 위험 감지'})
+               ref.update({'comment' : '아기가 잘 누워 있나요?'})
+               ref.update({'time' : "%04d/%02d/%02d %02d:%02d"%(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour,now.tm_min)})
+               socket.send('2')
                Flag = True
-        elif distance >= 80: # 아기 머리가 멀어짐
+        elif distance >= 45: # 아기 머리가 멀어짐
             if Flag == True :
                print("Safe : %.1f" % distance)
-               ref.update({'distance detection' : 'flase'})
+               ref.delete()
                Flag = False
 
 except KeyboardInterrupt:
     GPIO.cleanup()
+    socket.close()
 
