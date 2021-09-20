@@ -49,14 +49,18 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
 
         // 질식사 위험 감지 : R.drawable.ic_baseline_camera_alt_24
         // "아기가 잘 자고 있나요?" "아기가 위험해요!!
-        // 낙상 위험 감지 : R.drawable.ic_baseline_mic_24
+        // 낙상 위험 감지 : R.drawable.ic_baseline_warning_24
         // "아기가 잘 누워 있나요?" "아기가 침대에서 떨어질 것 같아요!!!"
-        // 울음소리 감지 : R.drawable.ic_baseline_warning_24
+        // 울음소리 감지 : R.drawable.ic_baseline_mic_24
         // "아기가 배고파해요!!" "아이가 졸려요!!"
 
-        if (arrayList.get(position).getTitle().equals("질식사 위험")) {
+        if (arrayList.get(position).getTitle().equals("질식사 위험 감지")) {
             Log.d("파베 데이터 확인", arrayList.get(position).getTitle());
             holder.image.setImageResource(R.drawable.ic_baseline_camera_alt_24);
+        }
+        else if (arrayList.get(position).getTitle().equals("낙상 위험 감지")) {
+            Log.d("파베 데이터 확인", arrayList.get(position).getTitle());
+            holder.image.setImageResource(R.drawable.ic_baseline_warning_24);
         }
     }
 
