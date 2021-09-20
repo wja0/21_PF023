@@ -8,6 +8,11 @@ from firebase_admin import auth
 from firebase_admin import credentials, db
 
 from flask import Flask, render_template, Response
+from bluetooth import *
+
+# bluetooth
+socket = BluetoothSocket(RFCOMM)
+socket.connect(("98:D3:71:FD:BF:91", 1))
 
 #from firebase_admin import firestore
 
@@ -73,9 +78,10 @@ def gen_frames():  # generate frame by frame from camera
                         print("아기가 잘 자고 있나요?")
                         Alarm = False
                         now = time.localtime()
-                        ref.update({'title' : '질식사 위험'})
+                        ref.update({'title' : '질식사 위험 감지'})
                         ref.update({'comment' : '아기가 잘 자고 있나요?'})
                         ref.update({'time'  :  "%04d/%02d/%02d %02d:%02d"%(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour,now.tm_min)})
+                        socket.send('1')
                         cnt2 = 0
                 else :
                         cnt2 += 1
@@ -105,4 +111,8 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port = 8090)
+    try :
+           app.run(host='0.0.0.0', port = 8090)
+    except KeyboardInterrupt:
+           print('강제종료') # 안뜸;;
+           socket.close()
