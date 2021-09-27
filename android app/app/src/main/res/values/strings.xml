@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">probono</string>
+    <string name="msg_token_fmt" translatable="false">토큰 : %s</string>
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
 </resources>
