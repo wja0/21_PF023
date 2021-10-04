@@ -62,6 +62,11 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
             Log.d("파베 데이터 확인", arrayList.get(position).getTitle());
             holder.image.setImageResource(R.drawable.ic_baseline_warning_24);
         }
+        else if (arrayList.get(position).getTitle().equals("울음 소리 감지")) {
+            Log.d("파베 데이터 확인", arrayList.get(position).getTitle());
+            holder.image.setImageResource(R.drawable.ic_baseline_volume_up_24);
+        }
+
     }
 
     @Override

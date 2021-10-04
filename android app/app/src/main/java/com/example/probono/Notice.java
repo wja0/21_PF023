@@ -42,7 +42,7 @@ public class Notice extends AppCompatActivity {
         database = FirebaseDatabase.getInstance(); // 파이어베이스 DB 연동
 
         databaseReference = database.getReference("alarm"); // DB 테이블 연동 맨 위 값
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
                 // 파이어베이스 DB의 데이터를 받아오는 곳
