@@ -89,7 +89,10 @@ public class Record extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         // 가져오기
         super.onCreate(savedInstanceState);
+        androidx.appcompat.app.ActionBar chg = getSupportActionBar();
+        chg.setTitle("기록");
         setContentView(R.layout.record);
+
         // 파이어베이스에서 값 받아올때 필요한 변수여서 위로 올림
         Intent receive_intent = getIntent();
         temp = receive_intent.getStringExtra("cal");

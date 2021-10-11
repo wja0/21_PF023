@@ -20,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        androidx.appcompat.app.ActionBar chg = getSupportActionBar();
+        chg.setTitle("PODO");
         setContentView(R.layout.activity_main);
 
         //모니터링 버튼 클릭시 이동
