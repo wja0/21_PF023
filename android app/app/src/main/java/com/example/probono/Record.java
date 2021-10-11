@@ -155,6 +155,7 @@ public class Record extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), HistoryCalendar.class);
                 startActivity(intent);
+                finish();
             }
         });
 
