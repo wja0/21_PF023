@@ -60,6 +60,7 @@ public class HistoryCalendar extends AppCompatActivity {
                 intent01.putExtra("cal", ""+format_date);
                 Log.d("달력날짜", format_date);
                 startActivity(intent01);
+                finish();
 
 //                LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 //                View view = inflater.inflate(R.layout.record, null);
