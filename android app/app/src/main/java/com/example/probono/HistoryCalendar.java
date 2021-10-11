@@ -25,6 +25,8 @@ public class HistoryCalendar extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        androidx.appcompat.app.ActionBar chg = getSupportActionBar();
+        chg.setTitle("날짜 선택");
         setContentView(R.layout.history_calendar);
 
 
