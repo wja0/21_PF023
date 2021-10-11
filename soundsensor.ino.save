@@ -1,0 +1,47 @@
+const int sampleWindow = 500;
+unsigned int sample;
+
+String cmd = "temp";
+
+int flag = 0;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(8,OUTPUT);
+}
+
+void loop() {
+  unsigned long startMillis = millis();
+  unsigned int peakToPeak = 0;
+
+  unsigned int signalMax = 0;
+  unsigned int signalMin = 1024;
+  
+  while (millis() - startMillis < sampleWindow)
+  {
+    sample = analogRead(0);
+    if (sample < 1024)
+    {
+      if (sample > signalMax)
+      {
+        signalMax = sample;
+      }
+      else if (sample < signalMin)
+      {
+        signalMin = sample;
+      }
+    }
+  }
+  peakToPeak = signalMax - signalMin;
+  double volts = (peakToPeak * 10.0) / 1024;
+
+  if(volts>=0.05) 
+  {
+     Serial.println(volts);
+     delay(10000);
+     Serial.println(-1);
+  }
+  
+ 
+}
+
