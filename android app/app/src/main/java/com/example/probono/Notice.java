@@ -31,6 +31,8 @@ public class Notice extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        androidx.appcompat.app.ActionBar chg = getSupportActionBar();
+        chg.setTitle("알림");
         setContentView(R.layout.notice);
 
         recyclerView = findViewById(R.id.noticeRecyclerView); // item 여러개 출력하는 layout
