@@ -3,6 +3,7 @@ package com.example.probono;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +22,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -52,6 +54,9 @@ public class Record extends AppCompatActivity {
     String temp;
     String amt, bmt;
 
+    RecyclerView rv;
+    RecordAdapter adapter;
+    ItemTouchHelper helper;
 
     //아래 세줄 time1에 오늘 날짜 넣기
     SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
@@ -80,7 +85,7 @@ public class Record extends AppCompatActivity {
 
     // 가져오기
     private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
+//    private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private ArrayList<RecordData> arrayList; // 중간 통신 매개체
     private FirebaseDatabase database;
@@ -92,6 +97,18 @@ public class Record extends AppCompatActivity {
         androidx.appcompat.app.ActionBar chg = getSupportActionBar();
         chg.setTitle("기록");
         setContentView(R.layout.record);
+
+
+//        //RecyclerView의 레이아웃 방식을 지정
+//        LinearLayoutManager manager = new LinearLayoutManager(this);
+//        manager.setOrientation(LinearLayoutManager.VERTICAL);
+//        rv.setLayoutManager(manager);
+
+//        //RecyclerView의 Adapter 세팅
+//        adapter = new RecordAdapter();
+//        rv.setAdapter(adapter);
+
+
 
         // 파이어베이스에서 값 받아올때 필요한 변수여서 위로 올림
         Intent receive_intent = getIntent();
@@ -107,6 +124,13 @@ public class Record extends AppCompatActivity {
         arrayList = new ArrayList<>(); // user 객체를 담을 어레이 리스트 (어댑터 쪽으로 전송)
 
         database = FirebaseDatabase.getInstance(); // 파이어베이스 DB 연동
+
+
+        //ItemTouchHelper 생성
+        helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
+        //RecyclerView에 ItemTouchHelper 붙이기
+        rv = findViewById(R.id.recordRecyclerView);
+        helper.attachToRecyclerView(rv);
 
 // DATE 가져오기
         if (temp == null) {
