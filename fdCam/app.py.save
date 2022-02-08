@@ -1,0 +1,118 @@
+# -*- coding: utf-8 -*- 
+import numpy as np
+import cv2
+import time
+
+import firebase_admin
+from firebase_admin import auth
+from firebase_admin import credentials, db
+
+from flask import Flask, render_template, Response
+from bluetooth import *
+
+# bluetooth
+socket = BluetoothSocket(RFCOMM)
+socket.connect(("98:D3:71:FD:BF:91", 1))
+
+#from firebase_admin import firestore
+
+cred = credentials.Certificate("/home/pi/probono-da97e-firebase-adminsdk-23ap0-dce234980c.json")
+firebase_admin.initialize_app(cred, {
+                'databaseURL': 'https://probono-da97e-default-rtdb.firebaseio.com/' 
+})
+
+
+ref = db.reference('alarm/alarm_01')
+
+# Cascades 디렉토리의 haarcascade_frontalface_default.xml 파일을 Classifier로 사용
+faceCascade = cv2.CascadeClassifier('/home/pi/fdCam/haarcascades/haarcascade_frontalface_default.xml')
+
+app = Flask(__name__)
+
+cap = cv2.VideoCapture(0)
+
+def gen_frames():  # generate frame by frame from camera
+    cnt1 = 0
+    cnt2 = 0
+
+    Flag = False
+    Alarm = False
+    while True:
+        # Capture frame-by-frame
+        success, frame = cap.read()  # read the camera frame
+        ret, img = cap.read()
+        # Face Detection
+        img = cv2.flip(img, -1) # 상하반전
+        img = cv2.flip(img, 1) # 좌우반전
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        faces = faceCascade.detectMultiScale(
+            gray,
+            scaleFactor=1.2,
+            minNeighbors=5,
+            minSize=(20, 20)
+        )
+        for (x,y,w,h) in faces:
+            cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+            roi_gray = gray[y:y+h, x:x+w]
+            roi_color = img[y:y+h, x:x+w]
+
+        # 얼굴인식 시간 추가
+        if len(faces) > 0:
+            if Flag == False:
+                    cnt1 = 0
+                    cnt2 = 0
+            Flag = True # 인식 함
+            if Alarm == False:
+                if cnt1 == 20: # 자고 있다고 간주
+                        print("아기가 잠들었어요!")
+                        Alarm = True
+                        ref.delete()
+                else :
+                        cnt1 += 1
+                        print(cnt1)
+
+        if len(faces) == 0:
+            Flag = False
+            if Alarm == True: # 자고 있는데 얼굴인식 안됨
+                if cnt2 == 30 :
+                        print("아기가 잘 자고 있나요?")
+                        Alarm = False
+                        now = time.localtime()
+                        ref.update({'title' : '질식사 위험 감지'})
+                        ref.update({'comment' : '아기가 잘 자고 있나요?'})
+                        ref.update({'time'  :  "%04d/%02d/%02d %02d:%02d"%(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour,now.tm_min)})
+                        socket.send('1')
+                        cnt2 = 0
+                else :
+                        cnt2 += 1
+                        print(cnt2)
+
+        if not success:
+            break
+        else:
+            ret, buffer = cv2.imencode('.jpg', frame)
+            # ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                  # concat frame one by one and show result
+
+
+@app.route('/video_feed')
+def video_feed():
+    #Video streaming route. Put this in the src attribute of an img tag
+    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route('/')
+def index():
+    """Video streaming home page."""
+    return render_template('index.html')
+
+
+if __name__ == '__main__':
+    try :
+           app.run(host='0.0.0.0', port = 8090)
+    except KeyboardInterrupt:
+           print('강제종료') # 안뜸;;
+           socket.close()

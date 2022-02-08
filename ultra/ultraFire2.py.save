@@ -1,0 +1,91 @@
+# -*- coding: utf-8 -*- 
+
+from __future__ import print_function
+import time
+import RPi.GPIO as GPIO
+import time
+import firebase_admin
+from firebase_admin import auth
+from firebase_admin import credentials, db
+from bluetooth import *
+
+# bluetooth
+socket = BluetoothSocket(RFCOMM)
+socket.connect(("98:D3:71:FD:BF:91", 1))
+
+#from firebase_admin import firestore
+
+cred = credentials.Certificate("/home/pi/probono-da97e-firebase-adminsdk-23ap0-dce234980c.json")
+firebase_admin.initialize_app(cred, {
+                'databaseURL': 'https://probono-da97e-default-rtdb.firebaseio.com/' 
+})
+
+
+ref = db.reference('alarm/alarm_02')
+
+
+def measure():
+    GPIO.output(GPIO_TRIGGER, True)
+    time.sleep(0.00001)
+    GPIO.output(GPIO_TRIGGER, False)
+    start = time.time()
+
+    while GPIO.input(GPIO_ECHO)==0:
+        start = time.time()
+
+    while GPIO.input(GPIO_ECHO)==1:
+        stop = time.time()
+
+    elapsed = stop-start
+    distance = (elapsed * 34300)/2
+
+    return distance
+
+def measure_average():
+    distance1=measure()
+    time.sleep(0.1)
+    distance2=measure()
+    time.sleep(0.1)
+    distance3=measure()
+    distance = distance1 + distance2 + distance3
+    distance = distance / 3
+
+    return distance
+
+GPIO.setmode(GPIO.BCM)
+
+GPIO_TRIGGER = 23
+GPIO_ECHO = 24
+print("Ultrasonic Measurement")
+
+GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
+GPIO.setup(GPIO_ECHO, GPIO.IN)
+
+GPIO.output(GPIO_TRIGGER, False)
+
+Flag = False
+
+try:
+    while True:
+        distance = measure_average()
+        time.sleep(1)
+
+        if distance < 45: # 아기 머리가 가까움
+            if Flag == False :
+               print("Distance Detection : %.1f" % distance)
+               now = time.localtime()
+               ref.update({'title' : '낙상 위험 감지'})
+               ref.update({'comment' : '아기가 잘 누워 있나요?'})
+               ref.update({'time' : "%04d/%02d/%02d %02d:%02d"%(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour,now.tm_min)})
+               socket.send('2')
+               Flag = True
+        elif distance >= 45: # 아기 머리가 멀어짐
+            if Flag == True :
+               print("Safe : %.1f" % distance)
+               ref.delete()
+               Flag = False
+
+except KeyboardInterrupt:
+    GPIO.cleanup()
+    socket.close()
+
